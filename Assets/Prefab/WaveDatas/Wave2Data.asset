@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c95cf236bc175474f9c5b045ab0679dd, type: 3}
+  m_Name: Wave2Data
+  m_EditorClassIdentifier: 
+  WaveDuration: 60
+  RestDuration: 20
+  EnemiesPrefabPool:
+  - RawGuidValue: 848604d03be30684495e879fe83f6230
+  - RawGuidValue: 6705d1c3018645c409af3b716b1b8a75
+  EnemiesCount: 10
+  SuppliesPrefabPool:
+  - RawGuidValue: 4a351c361e3dec44299b83eac46de379
+  - RawGuidValue: 390e225d647878640bedc2d03ee4fc46
+  SuppliesCount: 10
