@@ -1,13 +1,16 @@
-﻿using UnityEditor;
+﻿using Fusion;
+using UnityEditor;
 using UnityEngine;
 
 namespace Assets.Scripts.Player.Components
 {
-    public class HealthComponent : MonoBehaviour
+    public class HealthComponent : NetworkBehaviour
     {
         public int MaxHealth;
         public int CurrentHealth;
         public bool IsDead = false;
+
+
 
         private void Start()
         {
@@ -27,6 +30,7 @@ namespace Assets.Scripts.Player.Components
                 Death();
             }
         }
+
 
         public virtual void Death()
         {

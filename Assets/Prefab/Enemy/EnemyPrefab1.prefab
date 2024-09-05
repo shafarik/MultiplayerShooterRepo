@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: -3635005579010276753}
   - component: {fileID: 2580865864385180883}
   - component: {fileID: 5375098943848335676}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: EnemyPrefab1
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -91,8 +91,10 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 8170329145361439496}
+  - {fileID: 1634469075865402192}
   - {fileID: 5858683439047009209}
   - {fileID: 5232899159854252209}
+  - {fileID: 1647737483861209094}
 --- !u!114 &5858683439047009209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,7 +224,8 @@ GameObject:
   - component: {fileID: 7780192679962793916}
   - component: {fileID: 7015531485706878625}
   - component: {fileID: 7668871611663541564}
-  m_Layer: 0
+  - component: {fileID: 1647737483861209094}
+  m_Layer: 6
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -317,3 +320,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1647737483861209094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2888144537720972451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0

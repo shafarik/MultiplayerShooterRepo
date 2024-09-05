@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3267448253215711156}
   - component: {fileID: 3493804260471720391}
   - component: {fileID: 3163859191172655837}
+  - component: {fileID: 3841303658413527846}
   m_Layer: 0
   m_Name: BombPickup
   m_TagString: Untagged
@@ -150,6 +151,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 3163859191172655837}
+  - {fileID: 3841303658413527846}
 --- !u!114 &3163859191172655837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -163,3 +165,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BombRadius: 5
+--- !u!114 &3841303658413527846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 467273438146871817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0

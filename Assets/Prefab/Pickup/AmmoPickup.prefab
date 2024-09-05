@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8397087757258162181}
   - component: {fileID: 2869342804416355481}
   - component: {fileID: 3685818206220067304}
+  - component: {fileID: -4915240623853677020}
   m_Layer: 0
   m_Name: AmmoPickup
   m_TagString: Untagged
@@ -163,3 +164,20 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 2869342804416355481}
+  - {fileID: -4915240623853677020}
+--- !u!114 &-4915240623853677020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6438479579593961316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0

@@ -71,15 +71,20 @@ namespace Assets.Scripts.Enemy
 
         public void ProvideAttack()
         {
-            if (Vector3.Distance(_targetPlayer.transform.position, transform.position) < _enemyAgent.stoppingDistance * 2)
+            if (_targetPlayer != null)
             {
-                if (_targetPlayer != null && AttackTimer < 0)
+                if (Vector3.Distance(_targetPlayer.transform.position, transform.position) < _enemyAgent.stoppingDistance * 2)
                 {
-                    Attack();
-                    AttackTimer = AttackTime;
+                    if (_targetPlayer != null && AttackTimer < 0)
+                    {
+                        Attack();
+                        AttackTimer = AttackTime;
+                    }
+
                 }
 
             }
+
         }
 
         public virtual void Attack()
@@ -89,41 +94,53 @@ namespace Assets.Scripts.Enemy
 
         public void SetTarget()
         {
-
-            if (PlayersArray.Length > 0)
+            if (Runner.IsServer)
             {
-                if (PlayersArray.Length > 1)
+                if (PlayersArray.Length > 0)
                 {
-                    for (int i = 0; i < PlayersArray.Length - 2; i++)
+                    if (PlayersArray.Length > 1)
                     {
-                        if (Vector3.Distance(transform.position, PlayersArray[i].transform.position) <
-                            Vector3.Distance(transform.position, PlayersArray[i + 1].transform.position))
-                        {
-                            target = PlayersArray[i].transform.position;
-                            _targetPlayer = PlayersArray[i];
 
-                        }
-                        else
-                        {
-                            target = PlayersArray[i + 1].transform.position;
-                            _targetPlayer = PlayersArray[i + 1];
+                        Debug.Log("PlayersArray.Length > 1");
 
+                        for (int i = 0; i < PlayersArray.Length - 1; i++)
+                        {
+                            Debug.Log("in for");
+
+                            if (Vector3.Distance(transform.position, PlayersArray[i].transform.position) <
+                                Vector3.Distance(transform.position, PlayersArray[i + 1].transform.position))
+                            {
+                                target = PlayersArray[i].transform.position;
+                                _targetPlayer = PlayersArray[i];
+
+                            }
+                            else
+                            {
+                                target = PlayersArray[i + 1].transform.position;
+                                _targetPlayer = PlayersArray[i + 1];
+
+                            }
                         }
                     }
-                }
-                else
-                {
-                    target = PlayersArray[0].transform.position;
-                    _targetPlayer = PlayersArray[0];
+                    else
+                    {
+                        target = PlayersArray[0].transform.position;
+                        _targetPlayer = PlayersArray[0];
 
+                    }
                 }
+
             }
         }
 
         public void SetAgentPosition()
         {
-            if (target != null)
-                _enemyAgent.SetDestination(new Vector3(target.x, target.y, transform.position.z));
+            if (Runner.IsServer)
+            {
+                if (target != null)
+                    _enemyAgent.SetDestination(new Vector3(target.x, target.y, transform.position.z));
+
+            }
         }
 
         public void Dead()
@@ -134,24 +151,27 @@ namespace Assets.Scripts.Enemy
 
         public void Flip()
         {
-            if (target != null)
+            if (Runner.IsServer)
             {
+                if (target != null)
+                {
 
-                if (_isFacingRight == 1 && target.x < transform.position.x)
-                {
-                    //transform.rotation = Quaternion.Slerp(transform.rotation, new Quaternion(0f, 180f, 0f, 0f), 0.0f);
-                    _body.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
-                    Debug.Log("SetRotation");
-                    _isFacingRight = -1;
+                    if (_isFacingRight == 1 && target.x < transform.position.x)
+                    {
+                        //transform.rotation = Quaternion.Slerp(transform.rotation, new Quaternion(0f, 180f, 0f, 0f), 0.0f);
+                        _body.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+                        Debug.Log("SetRotation");
+                        _isFacingRight = -1;
+                    }
+                    else if (_isFacingRight == -1 && target.x > transform.position.x)
+                    {
+                        _body.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+                        Debug.Log("SetRotation");
+                        _isFacingRight = 1;
+                    }
                 }
-                else if (_isFacingRight == -1 && target.x > transform.position.x)
-                {
-                    _body.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-                    Debug.Log("SetRotation");
-                    _isFacingRight = 1;
-                }
+
             }
         }
-
     }
 }

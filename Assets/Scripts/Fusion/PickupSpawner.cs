@@ -16,29 +16,31 @@ namespace Assets.Scripts.Fusion
 
         public void SpawnPickups(List<NetworkPrefabRef> pickupsPrefabPool, int pickupsCount)
         {
-            for (int i = 0; i < pickupsCount; i++)
+            if (Runner.IsServer)
             {
-                int randomIndex = Random.Range(0, pickupsPrefabPool.Count);
-
-                float randomX = 0;
-                float randomY = 0;
-
-
-                do
+                for (int i = 0; i < pickupsCount; i++)
                 {
-                    randomX = Random.Range(-SpawnPickupPositionRange, SpawnPickupPositionRange + 1);
-                    randomY = Random.Range(-SpawnPickupPositionRange + 5, SpawnPickupPositionRange - 5);
+                    int randomIndex = Random.Range(0, pickupsPrefabPool.Count);
 
-                    Debug.Log("Randomize Iteration");
+                    float randomX = 0;
+                    float randomY = 0;
+
+
+                    do
+                    {
+                        randomX = Random.Range(-SpawnPickupPositionRange, SpawnPickupPositionRange + 1);
+                        randomY = Random.Range(-SpawnPickupPositionRange + 5, SpawnPickupPositionRange - 5);
+
+                    }
+                    while (randomX == randomY);
+
+                    Vector3 randomVector = new Vector3(randomX, randomY, 0f);
+
+                    Runner.Spawn(pickupsPrefabPool[randomIndex], randomVector, Quaternion.identity, null);
+
+
+
                 }
-                while (randomX == randomY);
-
-                Vector3 randomVector = new Vector3(randomX, randomY, 0f);
-                Debug.Log("Random vector is " + randomVector);
-
-                Runner.Spawn(pickupsPrefabPool[randomIndex], randomVector, Quaternion.identity, null);
-
-
 
             }
         }

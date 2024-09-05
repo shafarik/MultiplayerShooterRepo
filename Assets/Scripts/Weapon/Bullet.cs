@@ -1,3 +1,4 @@
+using Assets.Scripts.Player;
 using Assets.Scripts.Player.Components;
 using Fusion;
 using System.Collections;
@@ -9,11 +10,11 @@ namespace Assets.Scripts.Weapon
     public class Bullet : NetworkBehaviour
     {
         private Vector3 _moveDirection;
-        private NetworkObject _player;
+        private PlayerCharacter _player;
         private WeaponStats _stats;
         public string TargetTagName = "Enemy";
 
-        public void Init(NetworkObject player, WeaponStats stats, Vector3 direction)
+        public void Init(PlayerCharacter player, WeaponStats stats, Vector3 direction)
         {
             _player = player;
             _stats = stats;
@@ -37,7 +38,10 @@ namespace Assets.Scripts.Weapon
 
             if (collision.gameObject.tag == TargetTagName)
             {
-                collision.gameObject.GetComponent<HealthComponent>().TakeDamage(_stats.Damage);
+                if (_player != null)
+                    collision.gameObject.GetComponent<EnemyHeathComponent>().SetPlayer(_player);
+
+                collision.gameObject.GetComponent<EnemyHeathComponent>().TakeDamage(_stats.Damage);
             }
         }
     }

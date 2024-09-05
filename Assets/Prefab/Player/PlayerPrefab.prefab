@@ -127,6 +127,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveSpeed: 5
   IsFasingRight: 1
+  KillsCount: 0
 --- !u!114 &-7102268637600821705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -160,6 +161,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 8175988123329709891}
+  - {fileID: -7102268637600821705}
   - {fileID: 5858683439047009209}
   - {fileID: 5232899159854252209}
 --- !u!114 &5858683439047009209

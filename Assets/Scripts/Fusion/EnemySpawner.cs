@@ -23,33 +23,34 @@ namespace Assets.Scripts.Fusion
 
         public void SpawnEnemies(List<NetworkPrefabRef> enemiesPrefabPool, int enemiesCount)
         {
-            for (int i = 0; i < enemiesCount; i++)
+            if (Runner.IsServer)
             {
-                int randomIndex = Random.Range(0, enemiesPrefabPool.Count);
 
-                float randomX = 0;
-                float randomY = 0;
-
-
-                do
+                for (int i = 0; i < enemiesCount; i++)
                 {
-                    randomX = Random.Range(-SpawnEnemyPositionRange, SpawnEnemyPositionRange + 1);
-                    randomY = Random.Range(-SpawnEnemyPositionRange, SpawnEnemyPositionRange + 1);
+                    int randomIndex = Random.Range(0, enemiesPrefabPool.Count);
 
-                    Debug.Log("Randomize Iteration");
+                    float randomX = 0;
+                    float randomY = 0;
+
+
+                    do
+                    {
+                        randomX = Random.Range(-SpawnEnemyPositionRange, SpawnEnemyPositionRange + 1);
+                        randomY = Random.Range(-SpawnEnemyPositionRange, SpawnEnemyPositionRange + 1);
+                    }
+                    while (randomX == randomY);
+
+                    Vector3 randomVector = new Vector3(randomX, randomY, 0f);
+
+                    NetworkObject SpawnedEnemy = Runner.Spawn(enemiesPrefabPool[randomIndex], randomVector, Quaternion.identity, null, (runner, o) =>
+                    {
+                        o.GetComponent<EnemyCharacter>().Init(_fusionManager);
+                    });
+
+                    _enemyPool.Add(SpawnedEnemy);
+
                 }
-                while (randomX == randomY);
-
-                Vector3 randomVector = new Vector3(randomX, randomY, 0f);
-                Debug.Log("Random vector is " + randomVector);
-
-                NetworkObject SpawnedEnemy = Runner.Spawn(enemiesPrefabPool[randomIndex], randomVector, Quaternion.identity, null, (runner, o) =>
-                {
-                    o.GetComponent<EnemyCharacter>().Init(_fusionManager);
-                });
-
-                _enemyPool.Add(SpawnedEnemy);
-
             }
         }
         public void SpawnWave()

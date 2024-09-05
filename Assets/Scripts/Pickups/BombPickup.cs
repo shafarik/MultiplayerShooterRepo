@@ -18,6 +18,8 @@ namespace Assets.Scripts.Pickups
             {
                 if (collider.gameObject.tag == "Enemy")
                 {
+                    collider.GetComponent<EnemyHeathComponent>().SetPlayer(collision.GetComponent<PlayerCharacter>());
+
                     collider.GetComponent<EnemyHeathComponent>().TakeDamage(2000);
                 }
             }

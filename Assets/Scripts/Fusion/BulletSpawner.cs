@@ -14,39 +14,78 @@ namespace Assets.Scripts.Fusion
 
         private float _timer = 0.0f;
 
+        private NetworkObject _player;
+
         private void Start()
         {
-            _fusionManager.OnNeedToSpawnBullet += SpawnBullet;
+            _fusionManager.OnPlayerSpawned += SetPlayer;
+            // _fusionManager.OnNeedToSpawnBullet += SpawnBullet;
         }
         private void OnDestroy()
         {
-            _fusionManager.OnNeedToSpawnBullet -= SpawnBullet;
+            _fusionManager.OnPlayerSpawned -= SetPlayer;
+
+            if (_player != null)
+                _player.GetComponent<PlayerCharacter>().OnBulletFire -= SpawnBullet;
         }
+
         private void Update()
         {
             _timer -= Time.deltaTime;
         }
 
-        public void SpawnBullet(NetworkObject player, Vector3 direction)
+        public void SetPlayer(NetworkObject player)
         {
-            if (_timer < 0 && player.GetComponentInChildren<WeaponScript>().CanFire())
+            _player = player;
+
+            _player.GetComponent<PlayerCharacter>().OnBulletFire += SpawnBullet;
+        }
+        public void SpawnBullet(PlayerCharacter player, Vector3 direction)
+        {
+            if (Runner.IsServer)
             {
-                _timer = player.GetComponentInChildren<WeaponScript>().WeaponStat.AttackTime;
-
-                int projamount = player.GetComponentInChildren<WeaponScript>().WeaponStat.ProjectileAmount;
-
-                if (projamount > 1)
+                var PlayerWeaponScript = player.GetComponentInChildren<WeaponScript>();
+                if (_timer < 0 && PlayerWeaponScript.CanFire())
                 {
-                    float newDirectionY = direction.y - (projamount / 2) * player.GetComponentInChildren<WeaponScript>().WeaponStat.Spread;
+                    _timer = PlayerWeaponScript.WeaponStat.AttackTime;
 
-                    for (int i = 0; i < projamount; i++)
+                    int projamount = PlayerWeaponScript.WeaponStat.ProjectileAmount;
+
+                    if (projamount > 1)
                     {
-                        direction = new Vector3(direction.x, newDirectionY, direction.z);
+                        float newDirectionY = direction.y - (projamount / 2) * PlayerWeaponScript.WeaponStat.Spread;
 
+                        for (int i = 0; i < projamount; i++)
+                        {
+                            direction = new Vector3(direction.x, newDirectionY, direction.z);
+
+                            Vector3 SpawnPosition = player.transform.position +
+                            (new Vector3(1 * player.IsFasingRight, -0.1f, 0));
+
+                            Runner.Spawn(PlayerWeaponScript.BulletPrefab,
+                                SpawnPosition,
+                                Quaternion.identity,
+                                null,
+                                (runner, o) =>
+                                {
+                                    o.GetComponent<Bullet>().Init(
+                                        player,
+                                        PlayerWeaponScript.WeaponStat,
+                                        direction);
+                                });
+
+                            PlayerWeaponScript.DecreaseAmmo();
+
+                            newDirectionY += PlayerWeaponScript.WeaponStat.Spread;
+                        }
+
+                    }
+                    else
+                    {
                         Vector3 SpawnPosition = player.transform.position +
-                        (new Vector3(1 * player.GetComponent<PlayerCharacter>().IsFasingRight, -0.1f, 0));
+                            (new Vector3(1 * player.IsFasingRight, -0.1f, 0));
 
-                        Runner.Spawn(player.GetComponentInChildren<WeaponScript>().BulletPrefab,
+                        Runner.Spawn(PlayerWeaponScript.BulletPrefab,
                             SpawnPosition,
                             Quaternion.identity,
                             null,
@@ -54,35 +93,14 @@ namespace Assets.Scripts.Fusion
                             {
                                 o.GetComponent<Bullet>().Init(
                                     player,
-                                    player.GetComponentInChildren<WeaponScript>().WeaponStat,
+                                    PlayerWeaponScript.WeaponStat,
                                     direction);
                             });
 
-                        player.GetComponentInChildren<WeaponScript>().DecreaseAmmo();
-
-                        newDirectionY += player.GetComponentInChildren<WeaponScript>().WeaponStat.Spread;
+                        PlayerWeaponScript.DecreaseAmmo();
                     }
-
                 }
-                else
-                {
-                    Vector3 SpawnPosition = player.transform.position +
-                        (new Vector3(1 * player.GetComponent<PlayerCharacter>().IsFasingRight, -0.1f, 0));
 
-                    Runner.Spawn(player.GetComponentInChildren<WeaponScript>().BulletPrefab,
-                        SpawnPosition,
-                        Quaternion.identity,
-                        null,
-                        (runner, o) =>
-                        {
-                            o.GetComponent<Bullet>().Init(
-                                player,
-                                player.GetComponentInChildren<WeaponScript>().WeaponStat,
-                                direction);
-                        });
-
-                    player.GetComponentInChildren<WeaponScript>().DecreaseAmmo();
-                }
             }
         }
     }

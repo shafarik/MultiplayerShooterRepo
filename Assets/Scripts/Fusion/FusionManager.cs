@@ -7,6 +7,9 @@ using System;
 using UnityEngine.SceneManagement;
 using Assets.Scripts.Player;
 using System.Linq;
+using Assets.Scripts.Player.Components;
+using TMPro;
+using UnityEngine.UI;
 
 namespace Assets.Scripts.Fusion
 {
@@ -20,6 +23,9 @@ namespace Assets.Scripts.Fusion
         [SerializeField] private NetworkPrefabRef _playerPrefab;
         private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
+        public string SessionNameString = "TestRoom";
+
+        #region Delegates
         public delegate void WeeaponSpawnAction(NetworkObject player);
 
         public event WeeaponSpawnAction OnPlayerSpawned;
@@ -27,6 +33,8 @@ namespace Assets.Scripts.Fusion
         public delegate void BulletSpawnAction(NetworkObject player, Vector3 direction);
 
         public event BulletSpawnAction OnNeedToSpawnBullet;
+
+        #endregion
 
         #region BasicFunctions
         //  public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
@@ -51,27 +59,22 @@ namespace Assets.Scripts.Fusion
 
         public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
         {
-            throw new NotImplementedException();
         }
 
         public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
         {
-            throw new NotImplementedException();
         }
 
         public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data)
         {
-            throw new NotImplementedException();
         }
 
         public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
         {
-            throw new NotImplementedException();
         }
 
         public void OnConnectedToServer(NetworkRunner runner)
         {
-            throw new NotImplementedException();
         }
         #endregion
 
@@ -94,12 +97,30 @@ namespace Assets.Scripts.Fusion
             await _runner.StartGame(new StartGameArgs()
             {
                 GameMode = mode,
-                SessionName = "TestRoom",
+                SessionName = SessionNameString,
                 Scene = scene,
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
             });
         }
+        //private void Update()
+        //{
+        //    PrintSpawnedCharacters();
+        //}
+        public void PrintSpawnedCharacters()
+        {
+            if (_spawnedCharacters.Count > 0)
+            {
+                foreach (var kvp in _spawnedCharacters)
+                {
+                    Debug.Log($"PlayerRef: {kvp.Key}, NetworkObject: {kvp.Value}");
+                }
 
+            }
+            else
+            {
+                Debug.Log("_spawnedCharacters is empty");
+            }
+        }
         public void TriggerPlayerSpawnedAction(NetworkObject player)
         {
             OnPlayerSpawned?.Invoke(player);
@@ -109,13 +130,29 @@ namespace Assets.Scripts.Fusion
         {
             OnNeedToSpawnBullet?.Invoke(player, direction);
         }
-        public void HostButton()
+        public void HostButton(TMP_InputField inputField)
         {
+            if (inputField != null)
+            {
+                if (inputField.text != "")
+                {
+                    SessionNameString = inputField.text;
+                }
+            }
+
             StartGame(GameMode.Host);
         }
 
-        public void ClientButton()
+        public void ClientButton(TMP_InputField inputField)
         {
+            if (inputField != null)
+            {
+                if (inputField.text != "")
+                {
+                    SessionNameString = inputField.text;
+                }
+            }
+
             StartGame(GameMode.Client);
         }
 
@@ -131,6 +168,13 @@ namespace Assets.Scripts.Fusion
 
                 TriggerPlayerSpawnedAction(networkPlayerObject);
             }
+
+            //if (runner.IsClient)
+            //{
+            //    Debug.Log("OnPlayerSpawned in Client " + player);
+
+            //    TriggerPlayerSpawnedAction(_spawnedCharacters[player]);
+            //}
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -148,9 +192,35 @@ namespace Assets.Scripts.Fusion
             return networkObjectsArray;
         }
 
+        public PlayerRef[] GetAllPlayerRefs()
+        {
+            PlayerRef[] PlayerRefsArray = _spawnedCharacters.Keys.ToArray();
+            return PlayerRefsArray;
+        }
+
         public NetworkObject GetPlayerNetworkObject(PlayerRef playerRef)
         {
             return _spawnedCharacters[playerRef];
+        }
+
+        public int[] GetPlayersHealth()
+        {
+            List<int> HealthList = new List<int>();
+            foreach (var player in GetAllPlayers())
+            {
+                HealthList.Add(player.GetComponent<PlayerHealthComponent>().CurrentHealth);
+            }
+            return HealthList.ToArray();
+        }
+
+        public int[] GetPlayersKills()
+        {
+            List<int> KillsList = new List<int>();
+            foreach (var player in GetAllPlayers())
+            {
+                KillsList.Add(player.GetComponent<PlayerCharacter>().KillsCount);
+            }
+            return KillsList.ToArray();
         }
 
         public void OnInput(NetworkRunner runner, NetworkInput input)
@@ -163,17 +233,20 @@ namespace Assets.Scripts.Fusion
 
             if (_fireJoystick.Horizontal != 0 || _fireJoystick.Vertical != 0)
             {
-                if (_spawnedCharacters.TryGetValue(runner.LocalPlayer, out NetworkObject playerObject))
-                {
-                    Debug.Log("Fire");
-                    if (playerObject.GetComponent<PlayerCharacter>().CanMoveOrShoot())
-                    {
-                        Vector3 BulletDirection = new Vector3(_fireJoystick.Horizontal, _fireJoystick.Vertical, 0);
-                        TriggerNeedToSpawnBulletAction(playerObject, BulletDirection);
 
-                        data.fireDirection = BulletDirection;
-                    }
-                }
+                Vector3 BulletDirection = new Vector3(_fireJoystick.Horizontal, _fireJoystick.Vertical, 0);
+
+                data.fireDirection = BulletDirection;
+
+                //if (_spawnedCharacters.TryGetValue(runner.LocalPlayer, out NetworkObject playerObject))
+                //{
+                //    Debug.Log("Fire");
+                //    if (playerObject.GetComponent<PlayerCharacter>().CanMoveOrShoot())
+                //    {
+                //        TriggerNeedToSpawnBulletAction(playerObject, BulletDirection);
+
+                //    }
+                //}
             }
             input.Set(data);
         }
