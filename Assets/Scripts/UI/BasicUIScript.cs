@@ -8,11 +8,11 @@ namespace Assets.Scripts.UI
     {
         [SerializeField] protected Canvas canvas;
 
-        public void ShowCanvas()
+        public virtual void ShowCanvas()
         {
             canvas.enabled = true;
         }
-        public void HideCanvas()
+        public virtual void HideCanvas()
         {
             canvas.enabled = false;
         }

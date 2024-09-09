@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Enemy;
+using Fusion;
 using System.Collections;
 using UnityEngine;
 
@@ -23,10 +24,22 @@ namespace Assets.Scripts.Player.Components
         {
             if (!GetComponent<EnemyCharacter>()._animator.GetBool("Dead"))
             {
+                if (_player != null)
+                    _player.AddDamageToCount(damage);
+
                 base.TakeDamage(damage);
 
-                GetComponent<EnemyCharacter>()._animator.SetTrigger("Hit");
+                if (Runner.IsServer)
+                {
+                    RpcSetTrigger();
+                }
             }
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RpcSetTrigger()
+        {
+            GetComponent<EnemyCharacter>()._animator.SetTrigger("Hit");
         }
         public void SetPlayer(PlayerCharacter player)
         {

@@ -56,6 +56,7 @@ namespace Assets.Scripts.Fusion
             //player.GetComponent<PlayerCharacter>().SetPlayerSkin(Animators[SkinIndex]);
         }
 
+
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void RpcUpdateSkin(PlayerRef[] playerRefsArray, NetworkId[] netObjIdArray)
         {
@@ -65,7 +66,7 @@ namespace Assets.Scripts.Fusion
                 {
                     NetworkObject playerObj = Runner.FindObject(netObjIdArray[i]);
 
-                    playerObj.GetComponent<PlayerCharacter>().SetPlayerSkin(Animators[SkinIndex]);
+                    playerObj.GetComponent<PlayerCharacter>().SetPlayerSkin(Animators[SkinIndex], this, playerObj);
                 }
             }
         }
@@ -79,9 +80,11 @@ namespace Assets.Scripts.Fusion
                 {
                     NetworkObject playerObj = Runner.FindObject(netObjIdArray[i]);
 
-                    playerObj.GetComponent<PlayerCharacter>().SetPlayerSkin(Animators[Index]);
+                    if (playerObj != null)
+                        playerObj.GetComponent<PlayerCharacter>().SetPlayerSkin(Animators[Index], this, playerObj);
                 }
             }
         }
+
     }
 }

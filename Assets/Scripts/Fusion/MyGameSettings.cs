@@ -11,6 +11,8 @@ namespace Assets.Scripts.Fusion
         public float WaveTimer;
         public float RestTimer;
 
+        public int MaxWaveNum = 3;
+
         private bool _isWaveNow = false;
         private bool _isRestNow = false;
 
@@ -26,15 +28,23 @@ namespace Assets.Scripts.Fusion
 
         public void StartWave()
         {
-            _waveNum++;
+            if (_waveNum < MaxWaveNum)
+            {
+                _waveNum++;
 
-            WaveTimer = _waveDataList[_waveNum - 1].WaveDuration;
+                WaveTimer = _waveDataList[_waveNum - 1].WaveDuration;
 
-            _isWaveNow = true;
-            OnWaveRestSwap?.Invoke(0);
+                _isWaveNow = true;
+                OnWaveRestSwap?.Invoke(0);
 
-            SpawnPickup();
-            SpawnEnemy();
+                SpawnPickup();
+                SpawnEnemy();
+            }
+        }
+
+        public int GetWaveNum()
+        {
+            return _waveNum;
         }
 
         public void StartRest()

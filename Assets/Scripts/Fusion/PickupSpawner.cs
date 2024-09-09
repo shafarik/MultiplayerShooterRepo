@@ -16,6 +16,8 @@ namespace Assets.Scripts.Fusion
 
         public void SpawnPickups(List<NetworkPrefabRef> pickupsPrefabPool, int pickupsCount)
         {
+            if (Runner != null)
+            {
             if (Runner.IsServer)
             {
                 for (int i = 0; i < pickupsCount; i++)
@@ -41,6 +43,8 @@ namespace Assets.Scripts.Fusion
 
 
                 }
+
+            }
 
             }
         }

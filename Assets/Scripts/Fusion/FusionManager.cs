@@ -10,6 +10,7 @@ using System.Linq;
 using Assets.Scripts.Player.Components;
 using TMPro;
 using UnityEngine.UI;
+using Assets.Scripts.Weapon;
 
 namespace Assets.Scripts.Fusion
 {
@@ -102,25 +103,7 @@ namespace Assets.Scripts.Fusion
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
             });
         }
-        //private void Update()
-        //{
-        //    PrintSpawnedCharacters();
-        //}
-        public void PrintSpawnedCharacters()
-        {
-            if (_spawnedCharacters.Count > 0)
-            {
-                foreach (var kvp in _spawnedCharacters)
-                {
-                    Debug.Log($"PlayerRef: {kvp.Key}, NetworkObject: {kvp.Value}");
-                }
 
-            }
-            else
-            {
-                Debug.Log("_spawnedCharacters is empty");
-            }
-        }
         public void TriggerPlayerSpawnedAction(NetworkObject player)
         {
             OnPlayerSpawned?.Invoke(player);
@@ -168,13 +151,6 @@ namespace Assets.Scripts.Fusion
 
                 TriggerPlayerSpawnedAction(networkPlayerObject);
             }
-
-            //if (runner.IsClient)
-            //{
-            //    Debug.Log("OnPlayerSpawned in Client " + player);
-
-            //    TriggerPlayerSpawnedAction(_spawnedCharacters[player]);
-            //}
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -213,6 +189,16 @@ namespace Assets.Scripts.Fusion
             return HealthList.ToArray();
         }
 
+        public int[] GetPlayersAmmo()
+        {
+            List<int> AmmoList = new List<int>();
+            foreach (var player in GetAllPlayers())
+            {
+                AmmoList.Add(player.GetComponentInChildren<WeaponScript>().CurrentAmmoAmount);
+            }
+            return AmmoList.ToArray();
+        }
+
         public int[] GetPlayersKills()
         {
             List<int> KillsList = new List<int>();
@@ -221,6 +207,16 @@ namespace Assets.Scripts.Fusion
                 KillsList.Add(player.GetComponent<PlayerCharacter>().KillsCount);
             }
             return KillsList.ToArray();
+        }
+
+        public int[] GetPlayersDamage()
+        {
+            List<int> DamageList = new List<int>();
+            foreach (var player in GetAllPlayers())
+            {
+                DamageList.Add(player.GetComponent<PlayerCharacter>().DamageCount);
+            }
+            return DamageList.ToArray();
         }
 
         public void OnInput(NetworkRunner runner, NetworkInput input)

@@ -41,7 +41,7 @@ namespace Assets.Scripts.Weapon
                 if (_player != null)
                     collision.gameObject.GetComponent<EnemyHeathComponent>().SetPlayer(_player);
 
-                collision.gameObject.GetComponent<EnemyHeathComponent>().TakeDamage(_stats.Damage);
+                collision.gameObject.GetComponent<HealthComponent>().TakeDamage(_stats.Damage);
             }
         }
     }

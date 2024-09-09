@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5858683439047009209}
   - component: {fileID: 5232899159854252209}
   - component: {fileID: -3635005579010276753}
-  - component: {fileID: 2580865864385180883}
+  - component: {fileID: 6463221598443295538}
   - component: {fileID: 5375098943848335676}
   m_Layer: 6
   m_Name: EnemyPrefab1
@@ -164,7 +164,7 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 1, y: 1.1111112}
   m_Direction: 0
---- !u!50 &2580865864385180883
+--- !u!50 &6463221598443295538
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0

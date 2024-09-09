@@ -16,9 +16,17 @@ namespace Assets.Scripts.UI
         [SerializeField] private MyGameSettings _gameSettings;
         [SerializeField] private FusionManager _fusionManager;
 
+        [Space]
+        [Space]
         public TMP_Text TMPTimerText;
         public TMP_Text TMPHealthText;
         public TMP_Text TMPKillsText;
+        public TMP_Text TMPAmmosText;
+        public TMP_Text TMPDamageText;
+
+        [Space]
+        [Space]
+        [SerializeField] private GameObject StartGameButton;
 
         private string _waveTimerText = "Wave time: ";
         private string _restTimerText = "Rest time: ";
@@ -30,9 +38,17 @@ namespace Assets.Scripts.UI
         private string _playerKillsText = "Kills: ";
         private int _playerKillsAmount = -1;
 
+        private string _playerAmmosText = "Ammo: ";
+        private int _playerAmmosAmount = -1;
+
+        private string _playerDamageText = "Damage: ";
+        private int _playerDamageAmount = -1;
+
         private PlayerRef[] PlayerRefsArray;
         private int[] _healthValuesArray;
         private int[] _killValuesArray;
+        private int[] _ammoValuesArray;
+        private int[] _damageValuesArray;
 
 
         private bool _isWaveNow;
@@ -72,6 +88,14 @@ namespace Assets.Scripts.UI
 
         }
 
+        public void CheckStartGameButton()
+        {
+            if (!Runner.IsServer)
+            {
+                StartGameButton.SetActive(false);
+            }
+        }
+
         private void ShowCanvasOnConnetct(NetworkObject player)
         {
             RpcShowCanvas();
@@ -93,7 +117,11 @@ namespace Assets.Scripts.UI
 
                     UpdatePlayerKills();
 
-                    RpcUpdateHealthKillValues(PlayerRefsArray, _healthValuesArray, _killValuesArray);
+                    UpdatePlayerAmmo();
+
+                    UpdatePlayerDamage();
+
+                    RpcUpdateHealthKillValues(PlayerRefsArray, _healthValuesArray, _killValuesArray, _ammoValuesArray, _damageValuesArray);
                 }
             }
         }
@@ -103,9 +131,19 @@ namespace Assets.Scripts.UI
 
             _healthValuesArray = _fusionManager.GetPlayersHealth();
         }
+        private void UpdatePlayerAmmo()
+        {
+
+            _ammoValuesArray = _fusionManager.GetPlayersAmmo();
+        }
         private void UpdatePlayerKills()
         {
             _killValuesArray = _fusionManager.GetPlayersKills();
+        }
+
+        private void UpdatePlayerDamage()
+        {
+            _damageValuesArray = _fusionManager.GetPlayersDamage();
         }
 
         private void UpdatePlayerStatText()
@@ -119,6 +157,16 @@ namespace Assets.Scripts.UI
             if (_playerKillsAmount >= 0)
             {
                 TMPKillsText.text = _playerKillsText + _playerKillsAmount;
+            }
+
+            if (_playerAmmosAmount >= 0)
+            {
+                TMPAmmosText.text = _playerAmmosText + _playerAmmosAmount + "/40";
+            }
+
+            if (_playerDamageAmount >= 0)
+            {
+                TMPDamageText.text = _playerDamageText + _playerDamageAmount;
             }
         }
 
@@ -148,30 +196,33 @@ namespace Assets.Scripts.UI
 
         public void UpdateTimerUI(int index)
         {
-            if (Runner.IsServer)
+            if (Runner != null)
             {
-
-                switch (index)
+                if (Runner.IsServer)
                 {
-                    case 0:
-                        RpcUpdateText(_waveTimerText);
-                        _timerText = _waveTimerText;
-                        _isWaveNow = true;
-                        break;
-                    case 1:
-                        RpcUpdateText(_restTimerText);
-                        _timerText = _restTimerText;
-                        _isWaveNow = false;
-                        break;
-                    default:
-                        break;
+
+                    switch (index)
+                    {
+                        case 0:
+                            RpcUpdateText(_waveTimerText);
+                            _timerText = _waveTimerText;
+                            _isWaveNow = true;
+                            break;
+                        case 1:
+                            RpcUpdateText(_restTimerText);
+                            _timerText = _restTimerText;
+                            _isWaveNow = false;
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
 
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void RpcUpdateHealthKillValues(PlayerRef[] PlayerRefs, int[] HealthValues, int[] KillValues)
+        public void RpcUpdateHealthKillValues(PlayerRef[] PlayerRefs, int[] HealthValues, int[] KillValues, int[] AmmoValues, int[] DamageValues)
         {
             for (int i = 0; i < PlayerRefs.Length; i++)
             {
@@ -181,9 +232,12 @@ namespace Assets.Scripts.UI
                 {
                     _playerHealthAmount = HealthValues[i];
                     _playerKillsAmount = KillValues[i];
+                    _playerAmmosAmount = AmmoValues[i];
+                    _playerDamageAmount = DamageValues[i];
                 }
             }
         }
+
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void RpcUpdateText(string text)
@@ -200,6 +254,8 @@ namespace Assets.Scripts.UI
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void RpcShowCanvas()
         {
+            CheckStartGameButton();
+
             ShowCanvas();
         }
 

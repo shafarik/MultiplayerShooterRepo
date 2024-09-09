@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Assets.Scripts.Fusion;
 using static Unity.Collections.Unicode;
+using Assets.Scripts.Weapon;
 
 namespace Assets.Scripts.Player
 {
@@ -15,6 +16,7 @@ namespace Assets.Scripts.Player
         public int IsFasingRight = 1;
 
         public int KillsCount = 0;
+        public int DamageCount = 0;
 
         public int SkinIndex = 0;
 
@@ -22,6 +24,11 @@ namespace Assets.Scripts.Player
         private Vector3 _fireDirection;
 
         private PlayerStateMachine _stateMachine;
+
+        private NetworkObject _playerObj;
+        private RuntimeAnimatorController[] _animatorsArray;
+
+        #region Delegates
 
         public delegate void BulletFireAction(PlayerCharacter player, Vector3 direction);
 
@@ -31,6 +38,7 @@ namespace Assets.Scripts.Player
 
         public event PlayerIsSpawned OnPlayerSpawned;
 
+        #endregion
 
         public override void Spawned()
         {
@@ -43,6 +51,13 @@ namespace Assets.Scripts.Player
         }
         public override void FixedUpdateNetwork()
         {
+            if (Runner.IsClient && Object.HasInputAuthority)
+            {
+                Debug.Log("skin index is " + SkinIndex);
+
+                RpcSkinTry(SkinIndex, _playerObj);
+            }
+
             if (CanMoveOrShoot())
             {
                 if (GetInput(out NetworkInputData data))
@@ -112,6 +127,25 @@ namespace Assets.Scripts.Player
         public void CharacterIsDead()
         {
             _stateMachine.ChangeState(_stateMachine.DeathState);
+
+            if (Runner.IsServer)
+            {
+                RpcCharacterIsDead();
+            }
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RpcCharacterIsDead()
+        {
+            _stateMachine.ChangeState(_stateMachine.DeathState);
+
+            GetComponentInChildren<WeaponScript>().gameObject.SetActive(false);
+
+        }
+
+        public bool PlayerIsDead()
+        {
+            return _stateMachine.CurrentState == _stateMachine.DeathState ? true : false;
         }
 
         public bool CanMoveOrShoot()
@@ -126,6 +160,11 @@ namespace Assets.Scripts.Player
         {
             KillsCount++;
         }
+        public void AddDamageToCount(int damage)
+        {
+            DamageCount += damage;
+        }
+
 
         public void BulletFire(PlayerCharacter player, Vector3 direction)
         {
@@ -133,15 +172,40 @@ namespace Assets.Scripts.Player
                 OnBulletFire?.Invoke(player, direction);
         }
 
-        public void SetPlayerSkin(RuntimeAnimatorController SkinController)
+        public void SetPlayerSkin(RuntimeAnimatorController SkinController, SkinManager _skinManager, NetworkObject playerObj)
         {
+            Debug.Log("SetPlayerSkin" + SkinController.name);
             GetComponentInChildren<Animator>().runtimeAnimatorController = SkinController;
+
+            if (playerObj != null)
+                _playerObj = playerObj;
+
+            if (_skinManager != null)
+            {
+                _animatorsArray = _skinManager.Animators.ToArray();
+
+                for (int i = 0; i < _animatorsArray.Length; i++)
+                {
+                    if (_animatorsArray[i] == SkinController)
+                    {
+                        SkinIndex = i; break;
+                    }
+                }
+            }
 
         }
 
         public void SetSkinIndex(int index)
         {
             SkinIndex = index;
+        }
+
+
+        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+        public void RpcSkinTry(int index, NetworkObject playerObj)
+        {
+            playerObj.GetComponent<PlayerCharacter>().SkinIndex = index;
+            playerObj.GetComponent<PlayerCharacter>().SetPlayerSkin(_animatorsArray[index], null, playerObj);
         }
     }
 }

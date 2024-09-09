@@ -17,6 +17,7 @@ MonoBehaviour:
   EnemiesPrefabPool:
   - RawGuidValue: 848604d03be30684495e879fe83f6230
   - RawGuidValue: 6705d1c3018645c409af3b716b1b8a75
+  - RawGuidValue: c2e31e9b267b133488724690449a331b
   EnemiesCount: 15
   SuppliesPrefabPool:
   - RawGuidValue: 4a351c361e3dec44299b83eac46de379

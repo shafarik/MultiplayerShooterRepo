@@ -100,13 +100,8 @@ namespace Assets.Scripts.Enemy
                 {
                     if (PlayersArray.Length > 1)
                     {
-
-                        Debug.Log("PlayersArray.Length > 1");
-
                         for (int i = 0; i < PlayersArray.Length - 1; i++)
                         {
-                            Debug.Log("in for");
-
                             if (Vector3.Distance(transform.position, PlayersArray[i].transform.position) <
                                 Vector3.Distance(transform.position, PlayersArray[i + 1].transform.position))
                             {
@@ -158,14 +153,15 @@ namespace Assets.Scripts.Enemy
 
                     if (_isFacingRight == 1 && target.x < transform.position.x)
                     {
-                        //transform.rotation = Quaternion.Slerp(transform.rotation, new Quaternion(0f, 180f, 0f, 0f), 0.0f);
-                        _body.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+                        _body.transform.rotation = new Quaternion(0f, 180f, 0f, 0f);
+
                         Debug.Log("SetRotation");
                         _isFacingRight = -1;
                     }
                     else if (_isFacingRight == -1 && target.x > transform.position.x)
                     {
-                        _body.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+                        _body.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
+
                         Debug.Log("SetRotation");
                         _isFacingRight = 1;
                     }
