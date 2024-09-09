@@ -50,7 +50,7 @@ namespace Assets.Scripts.Fusion
         public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
         public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
         public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
-        public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
+        // public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
         public void OnSceneLoadDone(NetworkRunner runner) { }
         public void OnSceneLoadStart(NetworkRunner runner) { }
         public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
@@ -78,6 +78,7 @@ namespace Assets.Scripts.Fusion
         {
         }
         #endregion
+
 
 
         async void StartGame(GameMode mode)
@@ -233,18 +234,38 @@ namespace Assets.Scripts.Fusion
                 Vector3 BulletDirection = new Vector3(_fireJoystick.Horizontal, _fireJoystick.Vertical, 0);
 
                 data.fireDirection = BulletDirection;
-
-                //if (_spawnedCharacters.TryGetValue(runner.LocalPlayer, out NetworkObject playerObject))
-                //{
-                //    Debug.Log("Fire");
-                //    if (playerObject.GetComponent<PlayerCharacter>().CanMoveOrShoot())
-                //    {
-                //        TriggerNeedToSpawnBulletAction(playerObject, BulletDirection);
-
-                //    }
-                //}
             }
             input.Set(data);
+        }
+
+        public void DisconectPlayer()
+        {
+            if (_runner.IsServer)
+            {
+                RpcDesconectAllPlayers();
+            }
+            else
+            {
+                Scene currentScene = SceneManager.GetActiveScene();
+                SceneManager.LoadScene(currentScene.name);
+
+            }
+
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+        public void RpcDesconectAllPlayers()
+        {
+            Scene currentScene = SceneManager.GetActiveScene();
+            SceneManager.LoadScene(currentScene.name);
+        }
+
+
+        public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
+        {
+            Debug.Log("HostMitigation");
+            Scene currentScene = SceneManager.GetActiveScene();
+            SceneManager.LoadScene(currentScene.name);
         }
     }
 }

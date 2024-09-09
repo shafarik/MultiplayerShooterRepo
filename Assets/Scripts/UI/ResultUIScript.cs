@@ -103,6 +103,5 @@ namespace Assets.Scripts.UI
                 }
             }
         }
-
     }
 }

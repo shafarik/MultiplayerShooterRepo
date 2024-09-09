@@ -8,10 +8,13 @@ namespace Assets.Scripts.UI
     public class MainMenuUIScript : BasicUIScript
     {
 
-
         public int value = 0;
         // Use this for initialization
         void Start()
+        {
+        }
+
+        private void OnDestroy()
         {
 
         }
@@ -19,7 +22,7 @@ namespace Assets.Scripts.UI
         // Update is called once per frame
         void Update()
         {
-
+            
         }
     }
 }

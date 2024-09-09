@@ -61,6 +61,7 @@ namespace Assets.Scripts.UI
             _fusionManager.OnPlayerSpawned += ShowCanvasOnConnetct;
 
             _fusionManager.OnPlayerSpawned += SetPlayerRefsArray;
+
         }
 
         private void OnDestroy()
@@ -70,6 +71,7 @@ namespace Assets.Scripts.UI
             _fusionManager.OnPlayerSpawned -= ShowCanvasOnConnetct;
 
             _fusionManager.OnPlayerSpawned -= SetPlayerRefsArray;
+
         }
 
         // Update is called once per frame
@@ -86,6 +88,11 @@ namespace Assets.Scripts.UI
                 UpdatePlayerStatText();
             }
 
+        }
+
+        public void OnStartButtonClicked()
+        {
+            StartGameButton.SetActive(false);
         }
 
         public void CheckStartGameButton()

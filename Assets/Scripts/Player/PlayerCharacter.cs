@@ -38,6 +38,10 @@ namespace Assets.Scripts.Player
 
         public event PlayerIsSpawned OnPlayerSpawned;
 
+        public delegate void PlayerDead();
+
+        public event PlayerDead OnPlayerDead;
+
         #endregion
 
         public override void Spawned()
@@ -79,8 +83,6 @@ namespace Assets.Scripts.Player
 
                     if (_fireDirection != Vector3.zero)
                     {
-                        Flip();
-
                         BulletFire(this, _fireDirection);
                     }
 
@@ -96,7 +98,7 @@ namespace Assets.Scripts.Player
         }
         public void Flip()
         {
-            if (_moveDirection != Vector3.zero)
+            if (_fireDirection == Vector3.zero)
             {
                 if (IsFasingRight == 1 && _moveDirection.x < 0)
                 {
@@ -128,6 +130,7 @@ namespace Assets.Scripts.Player
         {
             _stateMachine.ChangeState(_stateMachine.DeathState);
 
+
             if (Runner.IsServer)
             {
                 RpcCharacterIsDead();
@@ -137,9 +140,15 @@ namespace Assets.Scripts.Player
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void RpcCharacterIsDead()
         {
-            _stateMachine.ChangeState(_stateMachine.DeathState);
+            if (_stateMachine.CurrentState != _stateMachine.DeathState)
+            {
+                _stateMachine.ChangeState(_stateMachine.DeathState);
 
-            GetComponentInChildren<WeaponScript>().gameObject.SetActive(false);
+                OnPlayerDead?.Invoke();
+
+                GetComponentInChildren<WeaponScript>().gameObject.SetActive(false);
+
+            }
 
         }
 
