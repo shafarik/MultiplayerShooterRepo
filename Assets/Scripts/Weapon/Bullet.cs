@@ -29,7 +29,8 @@ namespace Assets.Scripts.Weapon
 
         public override void FixedUpdateNetwork()
         {
-            transform.position += _moveDirection.normalized * _stats.BulletSpeed * Runner.DeltaTime;
+            if (Runner.IsServer)
+                transform.position += _moveDirection.normalized * _stats.BulletSpeed * Runner.DeltaTime;
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
