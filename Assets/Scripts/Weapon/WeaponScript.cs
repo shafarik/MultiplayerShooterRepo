@@ -11,6 +11,8 @@ namespace Assets.Scripts.Weapon
 
         public int CurrentAmmoAmount;
 
+        public GameObject WeaponObject;
+
         private void Start()
         {
             CurrentAmmoAmount = WeaponStat.AmmoAmount;
@@ -29,6 +31,11 @@ namespace Assets.Scripts.Weapon
         public void AddAmmo(int newAmmo)
         {
             CurrentAmmoAmount = Mathf.Clamp(CurrentAmmoAmount + newAmmo, 0, WeaponStat.AmmoAmount);
+        }
+
+        public void HideWeapon()
+        {
+            WeaponObject.GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 0);
         }
     }
 }

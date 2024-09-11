@@ -47,14 +47,21 @@ namespace Assets.Scripts.Enemy
         // Update is called once per frame
         void Update()
         {
-            AttackTimer -= Time.deltaTime;
+            if (Runner != null)
+            {
+                if (Runner.IsServer)
+                {
+                    AttackTimer -= Time.deltaTime;
 
-            SetTarget();
-            SetAgentPosition();
+                    SetTarget();
+                    SetAgentPosition();
 
-            Flip();
+                    Flip();
 
-            CheckAttackDistance();
+                    CheckAttackDistance();
+
+                }
+            }
         }
 
         public void CheckAttackDistance()

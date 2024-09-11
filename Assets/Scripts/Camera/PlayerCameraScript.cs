@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Fusion;
 using Assets.Scripts.Player;
 using Fusion;
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,7 +23,29 @@ namespace Assets.Scripts.Camera
         // Use this for initialization
         void Start()
         {
+            _fusionManager.OnPlayerSpawned += PlayerSpawned;
+        }
 
+        private void PlayerSpawned(NetworkObject player)
+        {
+
+            _playerObj = _fusionManager.GetAllPlayers();
+            _playerRefs = _fusionManager.GetAllPlayerRefs();
+
+            //      GetComponent<CinemachineVirtualCamera>().Follow = player.gameObject.transform;
+
+            if (Runner.IsServer)
+            {
+                for (int i = 0; i < _playerObj.Length; i++)
+                {
+                    if (Runner.LocalPlayer == _playerRefs[i])
+                    {
+                        GetComponent<CinemachineVirtualCamera>().Follow = _playerObj[i].gameObject.transform;
+                    }
+                    else
+                        RpcSetVirtualCameraTarget(_playerObj[i].Id, _playerRefs[i]);
+                }
+            }
         }
 
         public void SetPlayerPos()
@@ -51,13 +74,6 @@ namespace Assets.Scripts.Camera
 
         void Update()
         {
-            if (localPlayerObj != null)
-            {
-                if (!IsSpectatorMode)
-                    transform.position = new Vector3(localPlayerObj.transform.position.x, localPlayerObj.transform.position.y, transform.position.z);
-                else if (otherPlayerObj != null)
-                    transform.position = new Vector3(otherPlayerObj.transform.position.x, otherPlayerObj.transform.position.y, transform.position.z);
-            }
 
         }
 
@@ -77,6 +93,14 @@ namespace Assets.Scripts.Camera
                     otherPlayerObj = Runner.FindObject(playerId[i]);
                 }
             }
+        }
+
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RpcSetVirtualCameraTarget(NetworkId PlayerId, PlayerRef _playerRef)
+        {
+            if (Runner.LocalPlayer == _playerRef)
+                GetComponent<CinemachineVirtualCamera>().Follow = Runner.FindObject(PlayerId).transform;
         }
 
         public void ToSpectatorMode()

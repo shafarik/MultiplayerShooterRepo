@@ -59,19 +59,27 @@ namespace Assets.Scripts.Fusion
 
         private void Update()
         {
-            RestTimer -= Time.deltaTime;
-            WaveTimer -= Time.deltaTime;
-
-            if (_isWaveNow && WaveTimer < 0)
+            if (Runner != null)
             {
-                _isWaveNow = false;
-                StartRest();
-            }
+                if (Runner.IsServer)
+                {
 
-            if (_isRestNow && RestTimer < 0)
-            {
-                _isRestNow = false;
-                StartWave();
+                    RestTimer -= Time.deltaTime;
+                    WaveTimer -= Time.deltaTime;
+
+                    if (_isWaveNow && WaveTimer < 0)
+                    {
+                        _isWaveNow = false;
+                        StartRest();
+                    }
+
+                    if (_isRestNow && RestTimer < 0)
+                    {
+                        _isRestNow = false;
+                        StartWave();
+                    }
+                }
+
             }
         }
 

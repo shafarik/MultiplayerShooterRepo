@@ -27,6 +27,7 @@ namespace Assets.Scripts.Player
 
         private NetworkObject _playerObj;
         private RuntimeAnimatorController[] _animatorsArray;
+        public PlayerMovementController PlayerMovementController;
 
         #region Delegates
 
@@ -43,6 +44,8 @@ namespace Assets.Scripts.Player
         public event PlayerDead OnPlayerDead;
 
         #endregion
+
+
 
         public override void Spawned()
         {
@@ -79,9 +82,12 @@ namespace Assets.Scripts.Player
                     {
                         _stateMachine.ChangeState(_stateMachine.IdleState);
                     }
-                    transform.position += data.direction * MoveSpeed * Runner.DeltaTime;
 
-                    if (_fireDirection != Vector3.zero)
+                    if (Object.HasInputAuthority)
+                        RpcMovePlayer(data.direction, MoveSpeed);
+                    //  transform.position += data.direction * MoveSpeed * Runner.DeltaTime;
+
+                    if (_fireDirection != Vector3.zero && Runner.IsServer)
                     {
                         BulletFire(this, _fireDirection);
                     }
@@ -90,6 +96,13 @@ namespace Assets.Scripts.Player
                     Flip();
                 }
             }
+        }
+
+        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+        public void RpcMovePlayer(Vector3 direction, float moveSpeed)
+        {
+            if (PlayerMovementController != null)
+                PlayerMovementController.MovePlayer(direction, moveSpeed);
         }
 
         public void SetFireDirection(Vector3 newDirection)
@@ -146,7 +159,7 @@ namespace Assets.Scripts.Player
 
                 OnPlayerDead?.Invoke();
 
-                GetComponentInChildren<WeaponScript>().gameObject.SetActive(false);
+                GetComponentInChildren<WeaponScript>().HideWeapon();
 
             }
 
@@ -183,6 +196,7 @@ namespace Assets.Scripts.Player
 
         public void SetPlayerSkin(RuntimeAnimatorController SkinController, SkinManager _skinManager, NetworkObject playerObj)
         {
+
             Debug.Log("SetPlayerSkin" + SkinController.name);
             GetComponentInChildren<Animator>().runtimeAnimatorController = SkinController;
 
@@ -201,7 +215,6 @@ namespace Assets.Scripts.Player
                     }
                 }
             }
-
         }
 
         public void SetSkinIndex(int index)
